@@ -1,3 +1,47 @@
+// constructor-lite - Generate minimal constructors for structs
+// Copyright (C) 2023 d-k-bo
+// SPDX-License-Identifier: MIT
+
+//! This crate provides the `ConstructorLite` derive macro for generating
+//! minimal constructors for a struct from its fields.
+//!
+//! It is primarily designed for structs where deriving [`Default`] is not
+//! possible because some fields don't implement it.
+//!
+//! By default, an associated function `new()` is generated, which expects every
+//! field that is not `Option<T>` as an argument.
+//!
+//! - To add an optional field to expected arguments of the constructor function,
+//!   it can be marked with `#[constructor(required)]`.
+//! - To remove a non-optional field that implements `Default` from the constructor
+//!   function, it can be marked with `#[constructor(default)]`.
+//! - To change the name of the generated function, the struct can be marked with e. g.
+//!   `#[constructor(name = "function_name")]`.
+//! - By default, the generated function has the same visibility as the struct.
+//!   To override this behaviour, the struct can be marked with e. g.
+//!   `#[constructor(visibility = "pub(super)")]`.
+//!
+//! For more advanced uses you might prefer using
+//! [`derive-new`](https://lib.rs/crates/derive-new) or
+//! [`derive_builder`](https://lib.rs/crates/derive_builder) instead.
+//!
+//! # Example
+//!
+//! ```rust
+//! use constructor_lite::ConstructorLite;
+//!
+//! #[derive(Debug, PartialEq, ConstructorLite)]
+//! struct Movie {
+//!     title: String,
+//!     year: Option<u16>,
+//! }
+//!
+//! assert_eq!(
+//!     Movie::new("Star Wars".to_owned()),
+//!     Movie { title: "Star Wars".to_owned(), year: None },
+//! )
+//! ```
+
 use darling::{ast::Data, util::Flag, Error, FromDeriveInput, FromField};
 use proc_macro2::Span;
 use quote::quote;
@@ -135,6 +179,9 @@ fn path_is_option(path: &Path) -> bool {
             .unwrap_or(false)
 }
 
+/// Generate a constructor for the required fields of the struct.
+///
+/// See the [`constructor-lite`](crate) crate documentation for more details.
 #[proc_macro_derive(ConstructorLite, attributes(constructor))]
 pub fn constructor_lite_derive(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     ConstructorLite::from_derive_input(&parse_macro_input!(input as syn::DeriveInput))
