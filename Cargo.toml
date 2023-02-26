@@ -1,9 +1,13 @@
 [package]
 name = "constructor-lite"
 version = "0.1.0"
+authors = ["d-k-bo <d-k-bo@mailbox.org>"]
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+description = "Generate minimal constructors for structs"
+repository = "https://github.com/d-k-bo/constructor-lite"
+license = "MIT"
+keywords = ["derive", "macro", "constructor"]
+categories = ["rust-patterns"]
 
 [lib]
 proc-macro = true
